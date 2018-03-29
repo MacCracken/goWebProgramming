@@ -14,9 +14,9 @@ func authenticate(w http.ResponseWriter, r *http.Request) {
 			Value:    session.Uuid,
 			HttpOnly: true,
 		}
-		http.SetCookie(w, &cookie)
-		http.Redirect(w, r, "/", 302)
+		http.SetCookie(writer, &cookie)
+		http.Redirect(writer, request, "/", 302)
 	} else {
-		http.Redirect(w, r, "/login", 302)
+		http.Redirect(writer, request, "/login", 302)
 	}
 }

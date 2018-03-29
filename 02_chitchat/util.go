@@ -1,10 +1,11 @@
 package main
 
 import (
+	"errors"
 	"net/http"
 )
 
-func session(w http.ResponseWriter, r *http.Request)(sess data.Session, err error) {
+func session(w http.ResponseWriter, r *http.Request) (sess data.Session, err error) {
 	cookie, err := r.Cookie("_cookie")
 	if err == nil {
 		sess = data.Session(Uuid: cookie.Value)
@@ -13,4 +14,14 @@ func session(w http.ResponseWriter, r *http.Request)(sess data.Session, err erro
 		}
 	}
 	return
+}
+
+func generateHTML(writer http.ResponseWriter, data interface{}, filenames ...string) {
+	var files []string
+	for _, file := range filenames {
+		files = append(files, fmt.Sprintf("templates/%s.html", file))
+	}
+
+	templates := template.Must(template.ParseFiles(files...))
+	templates.ExecuteTemplate(writer, "layout", data)
 }

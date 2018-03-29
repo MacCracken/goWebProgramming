@@ -1,7 +1,6 @@
 package main
 
 import (
-	"html/template"
 	"net/http"
 )
 
@@ -31,22 +30,16 @@ func main() {
 	server.ListenAndServe()
 }
 
-func index(w http.ResponseWriter, r *http.Request) {
+func index(writer http.ResponseWriter, request *http.Request) {
 	threads, err := data.Threads()
-	if err == nil {
-		_, err := session(w, r)
-		public_tmpl_files := []string{"templates/layout.html",
-			"templates/public.navbar.html",
-			"templates/index.html"}
-		private_tmpl_files := []string{"templates/layout.html",
-			"templates/private.avbar.html",
-			"templates/index.html"}
-		var templates *template.Template
-	} else if err != nil {
-		templates = template.Must(template.ParseFiles(private_tmpl_files...))
+	if err != nil {
+		error_message(writer, request, "Cannot get threads")
 	} else {
-		templates = template.Must(template.ParseFiles(public_tmpl_files...))
+		_, err := session(writer, request)
+		if err != nil {
+			generateHTML(writer, threads, "layout", "public.navbar", "index")
+		} else {
+			generateHTML(writer, threads, "layout", "private.navbar", "index")
+		}
 	}
-
-	templates.ExecuteTemplate(w, "layout", threads)
 }
